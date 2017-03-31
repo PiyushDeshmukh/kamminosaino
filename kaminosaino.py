@@ -2,7 +2,7 @@
 from prepdata import *
 import numpy as np
 import tensorflow as tf
-
+import random
 
 import tflearn
 
@@ -40,18 +40,22 @@ if __name__ == '__main__':
     print('Fetching pixels...')
     trainX = []
     trainY = []
-    for values in fetch_pixels():
-        inputs = values[0]
-        output = values[1]
-        outputs = [0] * output_nodes
-        outputs[ord(output) - ord('A')] += 1
-        trainX.append(inputs)
-        trainY.append(outputs)
+    gestures = fetch_pixels()
+    random.shuffle(gestures)
+    print("Done fetching pixels")
+
+    print("Loading the inputs and outputs")
+    for gesture in gestures:
+        #inputs = values[0]
+        #output = values[1]
+        #outputs = [0] * output_nodes
+        #outputs[ord(output) - ord('A')] += 1
+        #gesture.set_output(outputs)
+        trainX.append(gesture.get_pixels())
+        trainY.append(gesture.get_outputs())
         #trainY.append(ord(output) - ord('A'))
         #neural_net.train(inputs, outputs)
-        print(len(inputs), len(outputs))
-        print('.')
-    print('Done fetching images!!')
+    print('Done loaing!!')
     print(len(trainX), len(trainY))
 
     n = int(0.9 * len(trainX))
@@ -85,7 +89,7 @@ if __name__ == '__main__':
 
     print('Building model...')
     model = build_model()
-    model.fit(trainX, trainY, validation_set=0.1, show_metric=True, batch_size=32, n_epoch=40)
+    model.fit(trainX, trainY, validation_set=0.2, show_metric=True, batch_size=32, n_epoch=20)
 
     predictions = np.array(model.predict(testX)).argmax(axis=1)
     actual = testY.argmax(axis=1)
